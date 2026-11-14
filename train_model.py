@@ -11,7 +11,7 @@ from sklearn.metrics import confusion_matrix, precision_score, f1_score, recall_
 sns.set(style='white')
 
 # Load Data
-dataset = pd.read_csv(r'C:\Users\GULSHAN KUMAR SAHU\AVSCODE\FSDS_WITH_GEN_AI_AND_AGENTIC_AI_4PM\CICD\iris.csv')
+dataset = pd.read_csv(r'iris.csv')
 
 # Feature names (Ensure no extra spaces or parentheses)
 dataset.columns = [colname.strip(' (cm)').replace(" ", "_") for colname in dataset.columns.tolist()]
