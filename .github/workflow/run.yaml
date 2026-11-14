@@ -1,8 +1,7 @@
 name: Model Training CICD
 
 permissions:
-  id-token: write
-  contents: write
+  contents: read
 
 on:
   push:
@@ -15,30 +14,21 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          node-version: "20"
+          python-version: "3.11"
 
-      - name: Setup CML
-        uses: iterative/setup-cml@v2
-
-      - name: Train Model
-        env:
-          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install Dependencies and Train Model
         run: |
           pip install -r requirements.txt
-
           python train_model.py
 
-          echo "## RF and LR Model Score" > report.md
-          cat scores.txt >> report.md
-
-          echo "" >> report.md
-          echo "## Confusion Matrix & Feature Importance" >> report.md
-
-         cml publish ConfusionMatrix.png --md >> report.md
-         cml publish FeatureImportance.png --md >> report.md
-
-         cml comment create report.md
-
+      - name: Upload Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: model-results
+          path: |
+            scores.txt
+            ConfusionMatrix.png
+            FeatureImportance.png
