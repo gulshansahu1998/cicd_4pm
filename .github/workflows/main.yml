@@ -1,0 +1,43 @@
+name: Model Training CICD
+
+permissions:
+  id-token: write
+  contents: write
+
+on:
+  push:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Setup CML
+        uses: iterative/setup-cml@v2
+
+      - name: Train Model
+        env:
+          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          pip install -r requirements.txt
+
+          python train_model.py
+
+          echo "## RF and LR Model Score" > report.md
+          cat scores.txt >> report.md
+
+          echo "" >> report.md
+          echo "## Confusion Matrix & Feature Importance" >> report.md
+
+          echo "![](./ConfusionMatrix.png)" >> report.md
+          echo "![](./FeatureImportance.png)" >> report.md
+
+          cml comment create report.md
